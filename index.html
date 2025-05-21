@@ -322,9 +322,9 @@
           <input type="number" id="integracao" value="3.80" step="0.10">
         </div>
         <div>
-          <label for="domingo-gratis">
-            <input type="checkbox" id="domingo-gratis" checked> 
-            Desconto de R$ 10,00 aos domingos (apenas metrô)
+          <label for="domingo-especial">
+            <input type="checkbox" id="domingo-especial" checked> 
+            Considerar regras especiais de domingo
           </label>
         </div>
       </div>
@@ -459,7 +459,7 @@
       const tarifaEMTUI = parseFloat(document.getElementById('tarifa-emtu-ida').value);
       const tarifaEMTUV = parseFloat(document.getElementById('tarifa-emtu-volta').value);
       const integracao = parseFloat(document.getElementById('integracao').value);
-      const domingoGratis = document.getElementById('domingo-gratis').checked;
+      const domingoEspecial = document.getElementById('domingo-especial').checked;
       const mes = parseInt(document.getElementById('mes').value);
       
       let totalSP = 0;
@@ -480,18 +480,21 @@
           // Volta
           diaEMTU += tarifaEMTUV;
           diaSP += tarifaMetro + integracao; // Metrô + integração com ônibus
-        } else {
-          // Para domingos:
-          // Apenas metrô (ida e volta)
-          diaSP += tarifaMetro * 2; // Metrô ida e volta
-          diaEMTU += tarifaEMTUI;   // EMTU ida
-          diaEMTU += tarifaEMTUV;   // EMTU volta
+        } else if (domingoEspecial) {
+          // Para domingos com regras especiais:
+          // - Ônibus SP grátis
+          // - Metrô na volta: tarifa normal (5 reais)
+          diaSP += 0; // Ônibus SP grátis na ida
+          diaEMTU += tarifaEMTUI; // EMTU ida
           
-          // Aplicar desconto aos domingos se a opção estiver marcada
-          if (domingoGratis) {
-            diaSP -= 10.00;
-            diaSP = Math.max(0, diaSP); // Garantir que não fique negativo
-          }
+          diaSP += tarifaMetro; // Metrô na volta (5 reais)
+          diaEMTU += tarifaEMTUV; // EMTU volta
+        } else {
+          // Domingos sem regras especiais (cálculo normal)
+          diaSP += tarifaOnibusSP;
+          diaEMTU += tarifaEMTUI;
+          diaEMTU += tarifaEMTUV;
+          diaSP += tarifaMetro + integracao;
         }
         
         totalSP += diaSP;
@@ -513,20 +516,6 @@
       document.getElementById('total-emtu').textContent = formatarMoeda(totalEMTU);
       document.getElementById('total-geral').textContent = formatarMoeda(totalGeral);
       
-      // Mostrar detalhes para o Bilhete SP se houver dias de domingo selecionados
-      const diasDomingo = detalhamento.filter(item => item.isDomingo).length;
-      const totalRow = document.getElementById('total-sp-row');
-      
-      if (diasDomingo > 0 && document.getElementById('domingo-gratis').checked) {
-        const valorMetroDomingos = parseFloat(document.getElementById('tarifa-metro').value) * 2 * diasDomingo;
-        const descontoDomingos = Math.min(valorMetroDomingos, 10 * diasDomingo);
-        const valorFinalSP = totalSP;
-        
-        totalRow.querySelector('td:first-child').innerHTML = `Total Bilhete SP <small>(inclui desconto de ${formatarMoeda(descontoDomingos)} aos domingos)</small>`;
-      } else {
-        totalRow.querySelector('td:first-child').textContent = "Total Bilhete SP";
-      }
-      
       // Exibir detalhamento por dia
       const detalhamentoDiv = document.getElementById('detalhamento');
       let detalhamentoHTML = '<table class="summary-table">';
@@ -543,16 +532,8 @@
         let bilheteSPInfo = formatarMoeda(item.diaSP);
         
         // Adicionar detalhes extras para domingos
-        if (item.isDomingo) {
-          // Mostrar valor original e desconto para domingos
-          const valorMetro = parseFloat(document.getElementById('tarifa-metro').value) * 2;
-          const desconto = document.getElementById('domingo-gratis').checked ? 10 : 0;
-          
-          if (desconto > 0) {
-            bilheteSPInfo = `${formatarMoeda(valorMetro)} - ${formatarMoeda(desconto)} = ${formatarMoeda(item.diaSP)}`;
-          } else {
-            bilheteSPInfo = `${formatarMoeda(valorMetro)} (metrô ida/volta)`;
-          }
+        if (item.isDomingo && domingoEspecial) {
+          bilheteSPInfo = `${formatarMoeda(0)} (ônibus ida) + ${formatarMoeda(tarifaMetro)} (metrô volta) = ${formatarMoeda(item.diaSP)}`;
         }
         
         const diaNome = item.isDomingo ? `<span class="weekend">${item.dia} (Dom)</span>` : item.dia;
