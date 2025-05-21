@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Transporte</title>
+  <style>
+    :root {
+      --primary-color: #1a73e8;
+      --secondary-color: #f8f9fa;
+      --success-color: #34a853;
+      --warning-color: #fbbc05;
+      --danger-color: #ea4335;
+      --text-color: #202124;
+      --light-text: #5f6368;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      background: var(--secondary-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: border 0.3s;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      background: #f1f3f4;
+      padding: 8px 15px;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    .checkbox-label:hover {
+      background: #e8eaed;
+    }
+    .checkbox-label input {
+      width: auto;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .checkbox-label.selected {
+      background: var(--primary-color);
+      color: white;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 15px 0;
+      font-size: 16px;
+      font-weight: 500;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0d65d9;
+    }
+    .resultado {
+      background: #e6f4ea;
+      border-left: 5px solid var(--success-color);
+      padding: 15px;
+      margin-top: 25px;
+      border-radius: 8px;
+    }
+    .resultado-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+    .total-geral {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #ccc;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    .info-icon {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background: #ddd;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 18px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 5px;
+      color: #555;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 250px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -125px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      font-weight: normal;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin: 15px 0;
+    }
+    .calendar-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-bottom: 5px;
+      text-align: center;
+      font-weight: 500;
+    }
+    .calendar-header span {
+      padding: 5px;
+    }
+    .calendar-day {
+      padding: 10px 0;
+      text-align: center;
+      background: #f1f3f4;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .calendar-day:hover {
+      background: #e8eaed;
+    }
+    .calendar-day.selected {
+      background: var(--primary-color);
+      color: white;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .summary-table th, .summary-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    .summary-table th {
+      font-weight: 500;
+      color: var(--light-text);
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab:hover {
+      color: var(--primary-color);
+    }
+    .tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+      font-weight: 500;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .weekend {
+      color: var(--danger-color);
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      .calendar-day {
+        padding: 8px 0;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Calculadora de Gastos com Transporte</h2>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('tab-dias')">Dias do Mês</div>
+      <div class="tab" onclick="switchTab('tab-manual')">Entrada Manual</div>
+    </div>
+
+    <div id="tab-dias" class="tab-content active">
+      <div class="form-group">
+        <label>Selecione o mês:</label>
+        <select id="mes" onchange="gerarCalendario()">
+          <option value="5">Maio</option>
+          <option value="6">Junho</option>
+          <option value="7">Julho</option>
+          <option value="8">Agosto</option>
+          <option value="9">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Selecione os dias de trabalho:</label>
+        <div class="calendar-header">
+          <span>Dom</span>
+          <span>Seg</span>
+          <span>Ter</span>
+          <span>Qua</span>
+          <span>Qui</span>
+          <span>Sex</span>
+          <span>Sáb</span>
+        </div>
+        <div class="calendar" id="calendar"></div>
+      </div>
+    </div>
+
+    <div id="tab-manual" class="tab-content">
+      <div class="form-group">
+        <label for="dias">Digite os dias utilizados separados por vírgula:</label>
+        <input type="text" id="dias" placeholder="Ex: 1,2,3,5,8,12,15,19,22,26,29">
+        <small style="color: var(--light-text);">Os domingos serão automaticamente identificados para cálculo correto.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Opções de tarifa:
+        <span class="tooltip">
+          <span class="info-icon">i</span>
+          <span class="tooltiptext">Você pode ajustar as tarifas conforme necessário para seus cálculos.</span>
+        </span>
+      </label>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+        <div>
+          <label for="tarifa-onibus">Tarifa Ônibus SP:</label>
+          <input type="number" id="tarifa-onibus" value="5.00" step="0.10">
+        </div>
+        <div>
+          <label for="tarifa-metro">Tarifa Metrô:</label>
+          <input type="number" id="tarifa-metro" value="5.00" step="0.10">
+        </div>
+        <div>
+          <label for="tarifa-emtu-ida">Tarifa EMTU (Ida):</label>
+          <input type="number" id="tarifa-emtu-ida" value="6.40" step="0.10">
+        </div>
+        <div>
+          <label for="tarifa-emtu-volta">Tarifa EMTU (Volta):</label>
+          <input type="number" id="tarifa-emtu-volta" value="9.80" step="0.10">
+        </div>
+        <div>
+          <label for="integracao">Tarifa Integração:</label>
+          <input type="number" id="integracao" value="3.80" step="0.10">
+        </div>
+        <div>
+          <label for="domingo-gratis">
+            <input type="checkbox" id="domingo-gratis" checked> 
+            Desconto de R$ 10,00 aos domingos (apenas metrô)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="calcular()" class="btn-primary">Calcular Gastos</button>
+    
+    <div class="resultado" id="resultado" style="display:none;">
+      <h3>Resumo de Gastos</h3>
+      <table class="summary-table">
+        <tr>
+          <th>Descrição</th>
+          <th>Valor</th>
+        </tr>
+        <tr id="total-sp-row">
+          <td>Total Bilhete SP</td>
+          <td id="total-sp">R$ 0,00</td>
+        </tr>
+        <tr>
+          <td>Total Bilhete EMTU</td>
+          <td id="total-emtu">R$ 0,00</td>
+        </tr>
+        <tr>
+          <td><strong>Total Geral</strong></td>
+          <td id="total-geral"><strong>R$ 0,00</strong></td>
+        </tr>
+      </table>
+      
+      <div style="margin-top: 20px;">
+        <h4>Detalhamento por dia:</h4>
+        <div id="detalhamento"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Inicializar o calendário com o mês atual
+    document.addEventListener('DOMContentLoaded', function() {
+      const dataAtual = new Date();
+      document.getElementById('mes').value = dataAtual.getMonth() + 1;
+      gerarCalendario();
+    });
+
+    function switchTab(tabId) {
+      // Desativar todas as abas
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Ativar a aba selecionada
+      document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function gerarCalendario() {
+      const mes = parseInt(document.getElementById('mes').value);
+      const ano = 2025; // Ano fixo conforme data atual
+      const calendarDiv = document.getElementById('calendar');
+      calendarDiv.innerHTML = '';
+      
+      // Gerar os dias do mês
+      const primeiroDia = new Date(ano, mes - 1, 1);
+      const ultimoDia = new Date(ano, mes, 0).getDate();
+      const primeiroDiaSemana = primeiroDia.getDay(); // 0 = Domingo, 6 = Sábado
+      
+      // Adicionar espaços vazios para alinhar o primeiro dia
+      for (let i = 0; i < primeiroDiaSemana; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.classList.add('calendar-day');
+        emptyDay.style.visibility = 'hidden';
+        calendarDiv.appendChild(emptyDay);
+      }
+      
+      // Adicionar os dias do mês
+      for (let dia = 1; dia <= ultimoDia; dia++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('calendar-day');
+        dayDiv.textContent = dia;
+        dayDiv.dataset.dia = dia;
+        
+        // Verificar se é fim de semana
+        const dataDia = new Date(ano, mes - 1, dia);
+        const diaSemana = dataDia.getDay();
+        if (diaSemana === 0 || diaSemana === 6) {
+          dayDiv.classList.add('weekend');
+        }
+        
+        // Adicionar evento de clique
+        dayDiv.addEventListener('click', function() {
+          this.classList.toggle('selected');
+        });
+        
+        calendarDiv.appendChild(dayDiv);
+      }
+    }
+
+    function getDiasSelecionados() {
+      if (document.getElementById('tab-dias').classList.contains('active')) {
+        // Pegar dias selecionados do calendário
+        const selectedDays = document.querySelectorAll('.calendar-day.selected');
+        return Array.from(selectedDays).map(day => parseInt(day.dataset.dia)).sort((a, b) => a - b);
+      } else {
+        // Pegar dias da entrada manual
+        const diasInput = document.getElementById('dias').value;
+        return diasInput.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d)).sort((a, b) => a - b);
+      }
+    }
+
+    function verificarDomingo(dia, mes) {
+      const ano = 2025; // Ano fixo conforme data atual
+      const data = new Date(ano, mes - 1, dia);
+      return data.getDay() === 0; // 0 representa domingo
+    }
+
+    function formatarMoeda(valor) {
+      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcular() {
+      const dias = getDiasSelecionados();
+      if (dias.length === 0) {
+        alert('Por favor, selecione pelo menos um dia!');
+        return;
+      }
+      
+      // Obter valores das tarifas
+      const tarifaOnibusSP = parseFloat(document.getElementById('tarifa-onibus').value);
+      const tarifaMetro = parseFloat(document.getElementById('tarifa-metro').value);
+      const tarifaEMTUI = parseFloat(document.getElementById('tarifa-emtu-ida').value);
+      const tarifaEMTUV = parseFloat(document.getElementById('tarifa-emtu-volta').value);
+      const integracao = parseFloat(document.getElementById('integracao').value);
+      const domingoGratis = document.getElementById('domingo-gratis').checked;
+      const mes = parseInt(document.getElementById('mes').value);
+      
+      let totalSP = 0;
+      let totalEMTU = 0;
+      const detalhamento = [];
+      
+      dias.forEach(dia => {
+        const isDomingo = verificarDomingo(dia, mes);
+        let diaSP = 0;
+        let diaEMTU = 0;
+        
+        // Para dias normais (segunda a sábado)
+        if (!isDomingo) {
+          // Ida
+          diaSP += tarifaOnibusSP;
+          diaEMTU += tarifaEMTUI;
+          
+          // Volta
+          diaEMTU += tarifaEMTUV;
+          diaSP += tarifaMetro + integracao; // Metrô + integração com ônibus
+        } else {
+          // Para domingos:
+          // Apenas metrô (ida e volta)
+          diaSP += tarifaMetro * 2; // Metrô ida e volta
+          diaEMTU += tarifaEMTUI;   // EMTU ida
+          diaEMTU += tarifaEMTUV;   // EMTU volta
+          
+          // Aplicar desconto aos domingos se a opção estiver marcada
+          if (domingoGratis) {
+            diaSP -= 10.00;
+            diaSP = Math.max(0, diaSP); // Garantir que não fique negativo
+          }
+        }
+        
+        totalSP += diaSP;
+        totalEMTU += diaEMTU;
+        
+        detalhamento.push({
+          dia: dia,
+          isDomingo: isDomingo,
+          diaSP: diaSP,
+          diaEMTU: diaEMTU,
+          diaTotal: diaSP + diaEMTU
+        });
+      });
+      
+      const totalGeral = totalSP + totalEMTU;
+      
+      // Exibir resultados
+      document.getElementById('total-sp').textContent = formatarMoeda(totalSP);
+      document.getElementById('total-emtu').textContent = formatarMoeda(totalEMTU);
+      document.getElementById('total-geral').textContent = formatarMoeda(totalGeral);
+      
+      // Mostrar detalhes para o Bilhete SP se houver dias de domingo selecionados
+      const diasDomingo = detalhamento.filter(item => item.isDomingo).length;
+      const totalRow = document.getElementById('total-sp-row');
+      
+      if (diasDomingo > 0 && document.getElementById('domingo-gratis').checked) {
+        const valorMetroDomingos = parseFloat(document.getElementById('tarifa-metro').value) * 2 * diasDomingo;
+        const descontoDomingos = Math.min(valorMetroDomingos, 10 * diasDomingo);
+        const valorFinalSP = totalSP;
+        
+        totalRow.querySelector('td:first-child').innerHTML = `Total Bilhete SP <small>(inclui desconto de ${formatarMoeda(descontoDomingos)} aos domingos)</small>`;
+      } else {
+        totalRow.querySelector('td:first-child').textContent = "Total Bilhete SP";
+      }
+      
+      // Exibir detalhamento por dia
+      const detalhamentoDiv = document.getElementById('detalhamento');
+      let detalhamentoHTML = '<table class="summary-table">';
+      detalhamentoHTML += `
+        <tr>
+          <th>Dia</th>
+          <th>Bilhete SP</th>
+          <th>EMTU</th>
+          <th>Total do Dia</th>
+        </tr>
+      `;
+      
+      detalhamento.forEach(item => {
+        let bilheteSPInfo = formatarMoeda(item.diaSP);
+        
+        // Adicionar detalhes extras para domingos
+        if (item.isDomingo) {
+          // Mostrar valor original e desconto para domingos
+          const valorMetro = parseFloat(document.getElementById('tarifa-metro').value) * 2;
+          const desconto = document.getElementById('domingo-gratis').checked ? 10 : 0;
+          
+          if (desconto > 0) {
+            bilheteSPInfo = `${formatarMoeda(valorMetro)} - ${formatarMoeda(desconto)} = ${formatarMoeda(item.diaSP)}`;
+          } else {
+            bilheteSPInfo = `${formatarMoeda(valorMetro)} (metrô ida/volta)`;
+          }
+        }
+        
+        const diaNome = item.isDomingo ? `<span class="weekend">${item.dia} (Dom)</span>` : item.dia;
+        detalhamentoHTML += `
+          <tr>
+            <td>${diaNome}</td>
+            <td>${bilheteSPInfo}</td>
+            <td>${formatarMoeda(item.diaEMTU)}</td>
+            <td><strong>${formatarMoeda(item.diaTotal)}</strong></td>
+          </tr>
+        `;
+      });
+      
+      detalhamentoHTML += '</table>';
+      detalhamentoDiv.innerHTML = detalhamentoHTML;
+      
+      // Exibir a div de resultado
+      document.getElementById('resultado').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
