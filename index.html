@@ -69,43 +69,53 @@
 
     <!-- Opções de tarifa -->
     <div class="form-group">
-      <label>
-        Opções de tarifa:
-        <span class="tooltip">
-          <span class="info-icon">i</span>
-          <span class="tooltiptext">Você pode ajustar as tarifas conforme necessário para seus cálculos.</span>
-        </span>
+  <label>
+    Opções de tarifa:
+    <span class="tooltip">
+      <span class="info-icon">i</span>
+      <span class="tooltiptext">Você pode ajustar as tarifas conforme necessário para seus cálculos e selecionar quais são utilizadas.</span>
+    </span>
+  </label>
+  
+  <div class="tarifas-grid">
+    <div class="tarifa-item">
+      <label for="tarifa-onibus">
+        <input type="checkbox" id="usar-onibus" checked> Tarifa Ônibus SP:
       </label>
-      
-      <div class="tarifas-grid">
-        <div>
-          <label for="tarifa-onibus">Tarifa Ônibus SP(ida/Volta):</label>
-          <input type="number" id="tarifa-onibus" value="5.00" step="0.10">
-        </div>
-        <div>
-          <label for="tarifa-metro">Tarifa Metrô(ida/volta):</label>
-          <input type="number" id="tarifa-metro" value="5.00" step="0.10">
-        </div>
-        <div>
-          <label for="tarifa-emtu-ida">Tarifa EMTU (Ida):</label>
-          <input type="number" id="tarifa-emtu-ida" value="6.40" step="0.10">
-        </div>
-        <div>
-          <label for="tarifa-emtu-volta">Tarifa EMTU (Volta):</label>
-          <input type="number" id="tarifa-emtu-volta" value="9.80" step="0.10">
-        </div>
-        <div>
-          <label for="integracao">Tarifa Integração:</label>
-          <input type="number" id="integracao" value="3.80" step="0.10">
-        </div>
-        <div class="checkbox-container">
-          <label for="domingo-especial">
-            <input type="checkbox" id="domingo-especial" checked> 
-            Domingo Gratuito Onibus SP (Marque Se Selecionar Domingo)
-          </label>
-        </div>
-      </div>
+      <input type="number" id="tarifa-onibus" value="5.00" step="0.10">
     </div>
+    <div class="tarifa-item">
+      <label for="tarifa-metro">
+        <input type="checkbox" id="usar-metro" checked> Tarifa Metrô:
+      </label>
+      <input type="number" id="tarifa-metro" value="5.00" step="0.10">
+    </div>
+    <div class="tarifa-item">
+      <label for="tarifa-emtu-ida">
+        <input type="checkbox" id="usar-emtu-ida" checked> Tarifa EMTU (Ida):
+      </label>
+      <input type="number" id="tarifa-emtu-ida" value="6.40" step="0.10">
+    </div>
+    <div class="tarifa-item">
+      <label for="tarifa-emtu-volta">
+        <input type="checkbox" id="usar-emtu-volta" checked> Tarifa EMTU (Volta):
+      </label>
+      <input type="number" id="tarifa-emtu-volta" value="9.80" step="0.10">
+    </div>
+    <div class="tarifa-item">
+      <label for="integracao">
+        <input type="checkbox" id="usar-integracao" checked> Tarifa Integração:
+      </label>
+      <input type="number" id="integracao" value="3.80" step="0.10">
+    </div>
+    <div class="checkbox-container">
+      <label for="domingo-especial">
+        <input type="checkbox" id="domingo-especial" checked> 
+        Considerar regras especiais de domingo
+      </label>
+    </div>
+  </div>
+</div>
 
     <!-- Botão de cálculo -->
     <button onclick="calcular()" class="btn-primary">Clique Aqui Para Calcular</button>
